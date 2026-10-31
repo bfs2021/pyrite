@@ -158,7 +158,8 @@ class TestInitCommand:
         assert (kb_path / "sources").is_dir()
 
     @pytest.mark.skipif(
-        sys.platform == "win32", reason="create takes the file lock, which refuses to run on Windows"
+        sys.platform == "win32",
+        reason="create takes the file lock, which refuses to run on Windows",
     )
     def test_create_source_after_research_init(self, cli_world):
         """`create -t source` works after a research init, end to end (#1384).
