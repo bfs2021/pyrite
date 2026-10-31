@@ -140,6 +140,27 @@ class TestInitCommand:
         assert data["template"] == "software"
         assert "types" in data
 
+    def test_init_research_template_declares_source(self, init_env):
+        """Research template declares a source type with a sources/ directory (#1384)."""
+        from pyrite.cli.init_command import BUILTIN_TEMPLATES
+
+        template = BUILTIN_TEMPLATES["research"]
+        assert "source" in template["types"]
+        assert template["types"]["source"]["subdirectory"] == "sources/"
+        assert "sources" in template["directories"]
+
+        kb_path = init_env["tmpdir"] / "research-kb"
+        config = init_env["config"]
+
+        with (
+            patch("pyrite.config.load_config", return_value=config),
+            patch("pyrite.config.save_config"),
+        ):
+            result = runner.invoke(test_app, ["--template", "research", "--path", str(kb_path)])
+
+        assert result.exit_code == 0, result.output
+        assert (kb_path / "sources").is_dir()
+
     @pytest.mark.control(
         reason="the deleted Entry.save/to_markdown is replaced by the create's text (new_entry_text), which the base already has; the property is unchanged (#955 P4)"
     )
