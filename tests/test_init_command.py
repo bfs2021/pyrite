@@ -140,7 +140,7 @@ class TestInitCommand:
         assert data["template"] == "software"
         assert "types" in data
 
-    def test_init_research_template_declares_source(self, init_env):
+    def test_init_research_template_declares_source(self, cli_world):
         """Research template declares a source type with a sources/ directory (#1384)."""
         from pyrite.cli.init_command import BUILTIN_TEMPLATES
 
@@ -149,14 +149,9 @@ class TestInitCommand:
         assert template["types"]["source"]["subdirectory"] == "sources/"
         assert "sources" in template["directories"]
 
-        kb_path = init_env["tmpdir"] / "research-kb"
-        config = init_env["config"]
-
-        with (
-            patch("pyrite.config.load_config", return_value=config),
-            patch("pyrite.config.save_config"),
-        ):
-            result = runner.invoke(test_app, ["--template", "research", "--path", str(kb_path)])
+        world = cli_world()
+        kb_path = world.config_dir / "research-kb"
+        result = runner.invoke(test_app, ["--template", "research", "--path", str(kb_path)])
 
         assert result.exit_code == 0, result.output
         assert (kb_path / "sources").is_dir()
